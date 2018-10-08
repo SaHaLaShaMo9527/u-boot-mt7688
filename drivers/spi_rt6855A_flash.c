@@ -631,7 +631,7 @@ char check_flash(void)
 		printf("%s: read_sr fail: %x\n", __func__, sr);
 		return -1;
 	}
-	if(sr==3){
+	if(sr&0x02 == 0x02){
 	return '4';
 	}
 	return '3';
@@ -646,18 +646,18 @@ void mycheck(void)
 		return -1;
 	}
 	printf("\nread sr=%x\n", sr);
-	if(sr==3){
+	if(sr&0x02){
 		raspi_wait_ready(1);
 		raspi_write_enable();
-		sr=1;
+		sr&=~0x02;
 		if(raspi_write_sr3(&sr) < 0) {
 		printf("%s: write fail: %x\n", __func__, sr);
 		return -1;}
 		printf("\nSwitch from 4B to 3B mode OK!!!!!!\n");	
-	}else if(sr==1){
+	}else{
 		raspi_wait_ready(1);
 		raspi_write_enable();
-		sr=3;
+		sr|=0x02;
 		if(raspi_write_sr3(&sr) < 0) {
 		printf("%s: write fail: %x\n", __func__, sr);
 		return -1;}
