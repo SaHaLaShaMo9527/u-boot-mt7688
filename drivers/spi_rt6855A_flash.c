@@ -615,6 +615,57 @@ static int raspi_write_sr(u8 *val)
 	return raspi_write_rg(OPCODE_WRSR, val);
 }
 
+int raspi_read_sr3(u8 *val) //add by mango
+{
+	return raspi_read_rg(0x15, val);
+}
+int raspi_write_sr3(u8 *val)
+{
+	return raspi_write_rg(0x11, val);
+}
+
+char check_flash(void)
+{
+	u8 sr = 0;
+	if (raspi_read_sr3(&sr) < 0) {
+		printf("%s: read_sr fail: %x\n", __func__, sr);
+		return -1;
+	}
+	if(sr&0x02 == 0x02){
+	return '4';
+	}
+	return '3';
+}
+
+
+void mycheck(void)
+{
+	u8 sr = 0;
+	if (raspi_read_sr3(&sr) < 0) {
+		printf("%s: read_sr fail: %x\n", __func__, sr);
+		return -1;
+	}
+	printf("\nread sr=%x\n", sr);
+	if(sr&0x02){
+		raspi_wait_ready(1);
+		raspi_write_enable();
+		sr&=~0x02;
+		if(raspi_write_sr3(&sr) < 0) {
+		printf("%s: write fail: %x\n", __func__, sr);
+		return -1;}
+		printf("\nSwitch from 4B to 3B mode OK!!!!!!\n");	
+	}else{
+		raspi_wait_ready(1);
+		raspi_write_enable();
+		sr|=0x02;
+		if(raspi_write_sr3(&sr) < 0) {
+		printf("%s: write fail: %x\n", __func__, sr);
+		return -1;}
+		printf("\nSwitch from 3B to 4B mode OK!!!!!!\n");	
+	}
+}
+
+
 /*
  * read SPI flash device ID
  */
@@ -727,7 +778,7 @@ static int raspi_read_scur(u8 *val)
 
 static int raspi_4byte_mode(int enable)
 {
-	ssize_t retval;
+	ssize_t retval = 0 ;
 	
 	raspi_wait_ready(1);
 
@@ -797,6 +848,7 @@ static int raspi_4byte_mode(int enable)
 		if (enable) {
 			ra_or(SPI_REG_CTL, 0x3 << 19);
 			ra_or(SPI_REG_Q_CTL, 0x3 << 8);
+		retval = bbu_spic_trans(code, 0, NULL, 1, 0, 0);
 		}
 		else {
 			ra_and(SPI_REG_CTL, ~SPI_CTL_SIZE_MASK);
@@ -1002,7 +1054,7 @@ struct chip_info *chip_prob(void)
 			if (info->jedec_id == jedec)
 #endif
 			{
-				printf("find flash: %s\n", info->name);
+				printf("find flash: %s\nflash address mode: %cB\n", info->name,check_flash());
 				return info;
 			}
 

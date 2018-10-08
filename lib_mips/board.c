@@ -131,6 +131,9 @@ void led_on(void);
 void led_off(void);
 int detect_wps(void);
 void gpio_test( void );
+extern void mycheck(void);
+
+
 static void Init_System_Mode(void)
 {
 	u32 reg;
@@ -536,7 +539,7 @@ static int init_func_ram (void)
 static int display_banner(void)
 {
    
-	printf ("\n\nWidora by mango,V1.0.8\n\n");
+	printf ("\n\nWidora by mango,V1.0.9\n\n");
 	return (0);
 }
 
@@ -877,6 +880,7 @@ void board_init_f(ulong bootflag)
 #define SEL_ENTER_CLI                   4
 #define SEL_LOAD_BOOT_WRITE_FLASH_BY_SERIAL 7
 #define SEL_LOAD_BOOT_SDRAM             8
+#define SEL_CHANGE_BOOT_3Bor4B			8
 #define SEL_LOAD_BOOT_WRITE_FLASH       9
 
 
@@ -894,6 +898,7 @@ void OperationSelect(void)
 #ifdef RALINK_UPGRADE_BY_SERIAL
 	printf("   %d: Load Boot Loader code then write to Flash via Serial. \n", SEL_LOAD_BOOT_WRITE_FLASH_BY_SERIAL);
 #endif // RALINK_UPGRADE_BY_SERIAL //
+	printf("   %d: Switch FLASH Boot address mode. \n", SEL_CHANGE_BOOT_3Bor4B);
 	printf("   %d: Load Boot Loader code then write to Flash via TFTP. \n", SEL_LOAD_BOOT_WRITE_FLASH);
 }
 
@@ -2164,12 +2169,17 @@ void board_init_r (gd_t *id, ulong dest_addr)
 			do_reset(cmdtp, 0, argc, argv);
 			break;
 #endif // RALINK_UPGRADE_BY_SERIAL //
-		case '8':
+	/*	case '8':
 			printf("   \n%d: System Load UBoot to SDRAM via TFTP. \n", SEL_LOAD_BOOT_SDRAM);
 			tftp_config(SEL_LOAD_BOOT_SDRAM, argv);
 			argc= 3;
 			setenv("autostart", "yes");
 			do_tftpb(cmdtp, 0, argc, argv);
+			break;
+	*/
+		case '8':	// by mango
+			printf("   \n%d: Switch FLASH Boot address mode. \n", SEL_CHANGE_BOOT_3Bor4B);
+			mycheck();
 			break;
 
 		case '9':
@@ -2966,7 +2976,4 @@ void gpio_test( void )
 	RALINK_REG(0xb0000620)=gpio_dat0;
 	RALINK_REG(0xb0000624)=gpio_dat1;
 }
-
-
-
 
