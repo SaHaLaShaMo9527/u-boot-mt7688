@@ -624,26 +624,44 @@ int raspi_write_sr3(u8 *val)
 	return raspi_write_rg(0x11, val);
 }
 
-void mycheck4b(void)
+char check_flash(void)
 {
 	u8 sr = 0;
 	if (raspi_read_sr3(&sr) < 0) {
 		printf("%s: read_sr fail: %x\n", __func__, sr);
 		return -1;
 	}
-	printf("sr3 = %x\n",sr);
-	if(sr==3)
-	{
+	if(sr==3){
+	return '4';
+	}
+	return '3';
+}
+
+
+void mycheck(void)
+{
+	u8 sr = 0;
+	if (raspi_read_sr3(&sr) < 0) {
+		printf("%s: read_sr fail: %x\n", __func__, sr);
+		return -1;
+	}
+	printf("\nread sr=%x\n", sr);
+	if(sr==3){
 		raspi_wait_ready(1);
 		raspi_write_enable();
 		sr=1;
 		if(raspi_write_sr3(&sr) < 0) {
 		printf("%s: write fail: %x\n", __func__, sr);
-		return -1;
-	}else
-	{
-		printf("write sr3 = %x OK!!!!!!\n",sr);	
-	}
+		return -1;}
+		printf("\nSwitch from 4B to 3B mode OK!!!!!!\n");	
+	}else if(sr==1){
+		raspi_wait_ready(1);
+		raspi_write_enable();
+		sr=3;
+		if(raspi_write_sr3(&sr) < 0) {
+		printf("%s: write fail: %x\n", __func__, sr);
+		return -1;}
+		printf("\nSwitch from 3B to 4B mode OK!!!!!!\n");	
 	}
 }
 
@@ -1036,7 +1054,7 @@ struct chip_info *chip_prob(void)
 			if (info->jedec_id == jedec)
 #endif
 			{
-				printf("find flash: %s\n", info->name);
+				printf("find flash: %s\nflash address mode: %cB\n", info->name,check_flash());
 				return info;
 			}
 
