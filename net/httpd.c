@@ -97,9 +97,9 @@ int do_http_progress( const int state ){
 			// blink LED fast 10 times
 			for ( i = 0; i < 10; ++i ) {
 				led_on();
-				udelay( 150000 );
+				udelay( 15000 );
 				led_off();
-				udelay( 150000 );
+				udelay( 15000 );
 			}
 
 			printf( "HTTP server is ready!\n\n" );
@@ -112,11 +112,11 @@ int do_http_progress( const int state ){
 		case WEBFAILSAFE_PROGRESS_UPLOAD_READY:
 
 			// blink LED fast 10 times
-			for ( i = 0; i < 10; ++i ) {
+			for ( i = 0; i < 5; ++i ) {
 				led_on();
-				udelay( 25000 );
+				udelay( 15000 );
 				led_off();
-				udelay( 25000 );
+				udelay( 15000 );
 			}
 			printf( "HTTP upload is done! Upgrading...\n" );
 			break;
@@ -124,11 +124,11 @@ int do_http_progress( const int state ){
 		case WEBFAILSAFE_PROGRESS_UPGRADE_READY:
 
 			// blink LED fast 10 times
-			for ( i = 0; i < 10; ++i ) {
+			for ( i = 0; i < 5; ++i ) {
 				led_on();
-				udelay( 150000 );
+				udelay( 15000 );
 				led_off();
-				udelay( 150000 );
+				udelay( 15000 );
 			}
 			printf( "HTTP ugrade is done! Rebooting...\n\n" );
 			break;
@@ -139,13 +139,13 @@ int do_http_progress( const int state ){
 			// blink LED fast for 4 sec
 			for ( i = 0; i < 80; ++i ) {
 				led_on();
-				udelay( 25000 );
+				udelay( 15000 );
 				led_off();
-				udelay( 25000 );
+				udelay( 15000 );
 			}
 
-			// wait 1 sec
-			udelay( 1000000 );
+			// wait 0.1 sec
+			udelay( 100000 );
 
 			break;
 	}
