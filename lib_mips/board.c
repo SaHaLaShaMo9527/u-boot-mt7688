@@ -131,6 +131,9 @@ void led_on(void);
 void led_off(void);
 int detect_wps(void);
 void gpio_test( void );
+extern void mycheck4b(void);
+
+
 static void Init_System_Mode(void)
 {
 	u32 reg;
@@ -2879,6 +2882,9 @@ void gpio_init(void)
 	val=RALINK_REG(RT2880_REG_PIODIR+0x04);	
 	val&=~1<<6;
 	RALINK_REG(RT2880_REG_PIODIR+0x04)=val;	
+
+
+	mycheck4b();
 }
 void led_on( void )
 {
@@ -2966,7 +2972,4 @@ void gpio_test( void )
 	RALINK_REG(0xb0000620)=gpio_dat0;
 	RALINK_REG(0xb0000624)=gpio_dat1;
 }
-
-
-
 
